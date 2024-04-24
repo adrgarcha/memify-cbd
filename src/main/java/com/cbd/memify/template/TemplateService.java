@@ -4,6 +4,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import lombok.RequiredArgsConstructor;
+import org.bson.Document;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
@@ -39,7 +40,20 @@ public class TemplateService {
     }
 
     public byte[] getTemplateByName(String name) throws IOException {
-        return gridFsTemplate.getResource(findFileByName(name)).getInputStream().readAllBytes();
+
+        GridFSFile templateFile = findFileByName(name);
+        if(templateFile == null)
+            return null;
+
+        return gridFsTemplate.getResource(templateFile).getInputStream().readAllBytes();
+    }
+
+    public Document getTemplateMetadataByName(String name) {
+        GridFSFile templateFile = findFileByName(name);
+        if(templateFile == null)
+            return null;
+
+        return templateFile.getMetadata();
     }
 
     public Template addTemplate(String username, String name, MultipartFile template) throws IOException {
@@ -53,7 +67,7 @@ public class TemplateService {
         return Template.builder().username(username).name(name).build();
     }
 
-    public GridFSFile findFileByName(String name) {
+    private GridFSFile findFileByName(String name) {
         return gridFsTemplate.findOne(new Query().addCriteria(Criteria.where("metadata.name").is(name)));
     }
 

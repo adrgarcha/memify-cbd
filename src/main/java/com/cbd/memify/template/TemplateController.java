@@ -1,13 +1,14 @@
 package com.cbd.memify.template;
 
 import com.cbd.memify.config.JwtService;
-import com.mongodb.client.gridfs.model.GridFSFile;
 import lombok.RequiredArgsConstructor;
+import org.bson.Document;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,21 +27,20 @@ public class TemplateController {
         return ResponseEntity.ok(templateService.getTemplates());
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<byte[]> getTemplateByName(@RequestParam String name) throws IOException {
+    @GetMapping("/{templateName}")
+    public ResponseEntity<byte[]> getTemplateByName(@PathVariable String templateName) throws IOException {
 
-        GridFSFile gridFsFile = templateService.findFileByName(name);
-        if (Objects.isNull(gridFsFile)) {
-            return ResponseEntity.notFound().build();
-        }
+        byte[] template = templateService.getTemplateByName(templateName);
+        if (Objects.isNull(template))
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Template not found");
 
-        if (Objects.isNull(gridFsFile.getMetadata())) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        Document templateMetadata = templateService.getTemplateMetadataByName(templateName);
+        if (Objects.isNull(templateMetadata))
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Metadata not found");
 
-        String contentType = gridFsFile.getMetadata().getString("_contentType");
+        String contentType = templateMetadata.getString("_contentType");
 
-        return ResponseEntity.ok().contentType(MediaType.valueOf(contentType)).body(templateService.getTemplateByName(name));
+        return ResponseEntity.ok().contentType(MediaType.valueOf(contentType)).body(template);
     }
 
     @PostMapping
@@ -48,17 +48,14 @@ public class TemplateController {
                                                 @RequestPart String name,
                                                 @RequestPart MultipartFile template) throws IOException {
 
-        if (name.isBlank() || template.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        if (name.isBlank() || template.isEmpty())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name and template are required");
 
-        if (templateService.findFileByName(name) != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+        if (templateService.getTemplateByName(name) != null)
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Template with this name already exists");
 
-        if (template.getContentType() != null && !template.getContentType().startsWith("image/")) {
-            return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).build();
-        }
+        if (template.getContentType() != null && !template.getContentType().startsWith("image/"))
+            throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Only images are supported");
 
         String token = authHeader.substring(7);
         String username = jwtService.extractUsername(token);
