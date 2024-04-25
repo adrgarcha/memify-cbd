@@ -21,10 +21,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+
+        String[] paths = new String[] {"/api/auth/**", "/error", "/docs", "/swagger-ui/**", "/v3/api-docs/**"};
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/api/v1/auth/**", "/error")
+                        .requestMatchers(paths)
                         .permitAll()
                         .anyRequest()
                         .authenticated())

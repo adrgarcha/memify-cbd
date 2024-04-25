@@ -1,5 +1,6 @@
 package com.cbd.memify.template;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/templates")
+@SecurityRequirement(name = "Authorization")
 @RequiredArgsConstructor
 public class TemplateController {
 
@@ -41,7 +43,7 @@ public class TemplateController {
         return ResponseEntity.ok().contentType(MediaType.valueOf(contentType)).body(template);
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Template> addTemplate(@RequestPart String name,
                                                 @RequestPart MultipartFile template) throws IOException {
 

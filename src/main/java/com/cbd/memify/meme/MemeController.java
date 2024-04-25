@@ -4,6 +4,7 @@ import com.cbd.memify.config.JwtService;
 import com.cbd.memify.template.TemplateService;
 import com.cbd.memify.user.User;
 import com.cbd.memify.user.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/memes")
+@SecurityRequirement(name = "Authorization")
 @AllArgsConstructor
 public class MemeController {
 
