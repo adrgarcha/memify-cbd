@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/memes")
+@RequestMapping("api/memes")
 @AllArgsConstructor
 public class MemeController {
 
@@ -25,7 +25,7 @@ public class MemeController {
     private final TemplateService templateService;
 
     @GetMapping
-    public ResponseEntity<List<UserMemeDTO>> getAllMemes() {
+    public ResponseEntity<List<MemeResponse>> getAllMemes() {
         return ResponseEntity.ok(memeService.getAllMemes());
     }
 
@@ -40,7 +40,7 @@ public class MemeController {
     }
 
     @GetMapping("/user/{username}")
-    public ResponseEntity<List<UserMemeDTO>> getMemesByUsername(@PathVariable String username) {
+    public ResponseEntity<List<MemeResponse>> getMemesByUsername(@PathVariable String username) {
 
         User user = userService.getUserByUsername(username);
         if(user == null)
@@ -50,7 +50,7 @@ public class MemeController {
     }
 
     @PostMapping
-    public ResponseEntity<UserMemeDTO> addMeme(@RequestHeader("Authorization") String authHeader, @RequestBody MemeDTO meme) throws IOException {
+    public ResponseEntity<MemeResponse> addMeme(@RequestHeader("Authorization") String authHeader, @RequestBody MemeRequest meme) throws IOException {
         String token = authHeader.substring(7);
         String username = jwtService.extractUsername(token);
         User user = userService.getUserByUsername(username);

@@ -27,7 +27,7 @@ public class MemeService {
     private final MemeRepository memeRepository;
     private final GridFsTemplate gridFsTemplate;
 
-    public List<UserMemeDTO> getAllMemes() {
+    public List<MemeResponse> getAllMemes() {
         return mapMemes(memeRepository.findAll());
     }
 
@@ -43,11 +43,11 @@ public class MemeService {
         return gridFsTemplate.getResource(memeFile).getInputStream().readAllBytes();
     }
 
-    public List<UserMemeDTO> getMemesByUserId(String username) {
+    public List<MemeResponse> getMemesByUserId(String username) {
         return mapMemes(memeRepository.findByUserId(username));
     }
 
-    public UserMemeDTO addMeme(MemeDTO meme, User user, byte[] template) throws IOException {
+    public MemeResponse addMeme(MemeRequest meme, User user, byte[] template) throws IOException {
         Meme newMeme = Meme.builder()
                 .name(meme.getName())
                 .templateName(meme.getTemplateName())
@@ -62,7 +62,7 @@ public class MemeService {
         metadata.put("name", newMeme.getName());
         gridFsTemplate.store(new ByteArrayInputStream(memeImage), newMeme.getId(), "image/png", metadata);
 
-        return UserMemeDTO.builder()
+        return MemeResponse.builder()
                 .name(newMeme.getName())
                 .templateName(newMeme.getTemplateName())
                 .username(newMeme.getUser().getUsername())
@@ -76,8 +76,8 @@ public class MemeService {
         gridFsTemplate.delete(new Query(Criteria.where("metadata.name").is(name)));
     }
 
-    private List<UserMemeDTO> mapMemes(List<Meme> memes) {
-        return memes.stream().map(meme -> UserMemeDTO.builder()
+    private List<MemeResponse> mapMemes(List<Meme> memes) {
+        return memes.stream().map(meme -> MemeResponse.builder()
                 .name(meme.getName())
                 .templateName(meme.getTemplateName())
                 .username(meme.getUser().getUsername())

@@ -1,14 +1,13 @@
 package com.cbd.memify.meme;
 
-import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
-public class UserMemeDTO {
+public class MemeRequest {
 
     private String name;
     private String templateName;
-    private String username;
+    private String upperText;
+    private String lowerText;
 
 }
