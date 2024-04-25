@@ -1,6 +1,5 @@
 package com.cbd.memify.template;
 
-import com.cbd.memify.config.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
 import org.springframework.http.HttpStatus;
@@ -20,7 +19,6 @@ import java.util.Objects;
 public class TemplateController {
 
     private final TemplateService templateService;
-    private final JwtService jwtService;
 
     @GetMapping
     public ResponseEntity<List<Template>> getTemplates() {
@@ -44,8 +42,7 @@ public class TemplateController {
     }
 
     @PostMapping
-    public ResponseEntity<Template> addTemplate(@RequestHeader("Authorization") String authHeader,
-                                                @RequestPart String name,
+    public ResponseEntity<Template> addTemplate(@RequestPart String name,
                                                 @RequestPart MultipartFile template) throws IOException {
 
         if (name.isBlank() || template.isEmpty())
@@ -57,10 +54,19 @@ public class TemplateController {
         if (template.getContentType() != null && !template.getContentType().startsWith("image/"))
             throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Only images are supported");
 
-        String token = authHeader.substring(7);
-        String username = jwtService.extractUsername(token);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(templateService.addTemplate(username, name, template));
+        return ResponseEntity.status(HttpStatus.CREATED).body(templateService.addTemplate(name, template));
+    }
+
+    @DeleteMapping("/{templateName}")
+    public ResponseEntity<Void> deleteTemplate(@PathVariable String templateName) throws IOException {
+
+        byte[] template = templateService.getTemplateByName(templateName);
+        if (Objects.isNull(template))
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Template not found");
+
+        templateService.deleteTemplateByName(templateName);
+        return ResponseEntity.noContent().build();
     }
 
 }

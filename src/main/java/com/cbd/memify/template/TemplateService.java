@@ -31,7 +31,6 @@ public class TemplateService {
             assert gridFsFile.getMetadata() != null;
             Template template = Template.builder()
                     .name(gridFsFile.getMetadata().getString("name"))
-                    .username(gridFsFile.getMetadata().getString("username"))
                     .build();
             templates.add(template);
         }
@@ -56,15 +55,18 @@ public class TemplateService {
         return templateFile.getMetadata();
     }
 
-    public Template addTemplate(String username, String name, MultipartFile template) throws IOException {
+    public Template addTemplate(String name, MultipartFile template) throws IOException {
 
         DBObject metaData = new BasicDBObject();
-        metaData.put("username", username);
         metaData.put("name", name);
 
         gridFsTemplate.store(template.getInputStream(), name, template.getContentType(), metaData);
 
-        return Template.builder().username(username).name(name).build();
+        return Template.builder().name(name).build();
+    }
+
+    public void deleteTemplateByName(String name) {
+        gridFsTemplate.delete(new Query().addCriteria(Criteria.where("metadata.name").is(name)));
     }
 
     private GridFSFile findFileByName(String name) {

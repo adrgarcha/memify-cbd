@@ -8,7 +8,6 @@ import lombok.Data;
 @Builder
 public class Template {
 
-    private String username;
     private String name;
 
 }
