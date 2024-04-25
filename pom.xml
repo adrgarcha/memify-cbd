@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.cbd</groupId>
 	<artifactId>memify</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>memify</name>
 	<description>Generate and share hilarious memes.</description>
 	<properties>
