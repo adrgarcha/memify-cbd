@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/memes")
+@RequestMapping("/api/memes")
 @AllArgsConstructor
 public class MemeController {
 
