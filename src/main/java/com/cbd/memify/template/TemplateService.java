@@ -25,7 +25,7 @@ public class TemplateService {
         List<GridFSFile> gridFsFiles = new ArrayList<>();
         List<Template> templates = new ArrayList<>();
 
-        gridFsTemplate.find(new Query()).into(gridFsFiles);
+        gridFsTemplate.find(new Query().addCriteria(Criteria.where("metadata.type").is("template"))).into(gridFsFiles);
         for (GridFSFile gridFsFile : gridFsFiles) {
 
             assert gridFsFile.getMetadata() != null;
@@ -40,7 +40,7 @@ public class TemplateService {
 
     public byte[] getTemplateByName(String name) throws IOException {
 
-        GridFSFile templateFile = findFileByName(name);
+        GridFSFile templateFile = findTemplateByName(name);
         if(templateFile == null)
             return null;
 
@@ -48,7 +48,7 @@ public class TemplateService {
     }
 
     public Document getTemplateMetadataByName(String name) {
-        GridFSFile templateFile = findFileByName(name);
+        GridFSFile templateFile = findTemplateByName(name);
         if(templateFile == null)
             return null;
 
@@ -59,6 +59,7 @@ public class TemplateService {
 
         DBObject metaData = new BasicDBObject();
         metaData.put("name", name);
+        metaData.put("type", "template");
 
         gridFsTemplate.store(template.getInputStream(), name, template.getContentType(), metaData);
 
@@ -69,8 +70,9 @@ public class TemplateService {
         gridFsTemplate.delete(new Query().addCriteria(Criteria.where("metadata.name").is(name)));
     }
 
-    private GridFSFile findFileByName(String name) {
-        return gridFsTemplate.findOne(new Query().addCriteria(Criteria.where("metadata.name").is(name)));
+    private GridFSFile findTemplateByName(String name) {
+        return gridFsTemplate.findOne(new Query().addCriteria(Criteria.where("metadata.name").is(name)
+                .and("metadata.type").is("template")));
     }
 
 }

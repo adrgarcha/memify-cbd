@@ -36,7 +36,8 @@ public class MemeService {
     }
 
     public byte[] getMemeImageByName(String name) throws IOException {
-        GridFSFile memeFile = gridFsTemplate.findOne(new Query(Criteria.where("metadata.name").is(name)));
+        GridFSFile memeFile = gridFsTemplate.findOne(new Query(Criteria.where("metadata.name").is(name)
+                .and("metadata.type").is("meme")));
         if(memeFile == null)
             return null;
 
@@ -60,6 +61,7 @@ public class MemeService {
         byte[] memeImage = createMeme(template, meme.getUpperText(), meme.getLowerText());
         DBObject metadata = new BasicDBObject();
         metadata.put("name", newMeme.getName());
+        metadata.put("type", "meme");
         gridFsTemplate.store(new ByteArrayInputStream(memeImage), newMeme.getId(), "image/png", metadata);
 
         return MemeResponse.builder()
@@ -73,7 +75,8 @@ public class MemeService {
         Meme meme = getMemeByName(name);
 
         memeRepository.delete(meme);
-        gridFsTemplate.delete(new Query(Criteria.where("metadata.name").is(name)));
+        gridFsTemplate.delete(new Query(Criteria.where("metadata.name").is(name)
+                .and("metadata.type").is("meme")));
     }
 
     private List<MemeResponse> mapMemes(List<Meme> memes) {
