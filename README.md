@@ -7,6 +7,11 @@
 </h1>
 
 ## Manual de desarrollador
+
+Para comenzar, es necesario [crear un clúster en MongoDB Atlas](https://www.mongodb.com/docs/atlas/getting-started/) utilizando tu cuenta. Una vez creado, obtendrás el enlace de conexión junto con el nombre de la base de datos que deseas utilizar. Este enlace te permitirá establecer la conexión con la base de datos de MongoDB.
+
+Una vez que hayas obtenido el enlace de conexión y el nombre de la base de datos, deberás crear un archivo llamado `.env` en el mismo directorio donde se encuentra el archivo `.env.example`. Este archivo contendrá el enlace de conexión y el nombre de la base de datos que has obtenido. Este paso es crucial para que la API pueda establecer la conexión con la base de datos de MongoDB de forma adecuada.
+
 ### Terminal
 
 Para comenzar, asegúrate de tener instalados en tu sistema operativo el gestor de paquetes Maven y JDK 17+ (puedes encontrar los enlaces de descarga en la bibliografía). Al terminar, sigue estos pasos:
@@ -33,6 +38,8 @@ En este procedimiento, no es necesario contar con ninguna instalación previa. S
 ## Manual de despliegue
 
 Para desplegar la aplicación en tu servicio de hosting preferido, se ha creado un archivo Dockerfile, que permite ejecutar la aplicación de forma sencilla en un entorno aislado y sin problemas de dependencias. Suponiendo que el servicio de alojamiento elegido admita la integración con repositorios de GitHub (una característica común en la mayoría de los servicios de hosting), podemos configurarlo para que la aplicación se despliegue automáticamente cuando se realicen cambios en la rama seleccionada.
+
+Recuerda que debes indicar las variables de entorno en el servicio de hosting que hayas seleccionado, en este caso deberás indicar el enlace de conexión con MongoDB Atlas y el nombre de la BD. Usa como referencia el `.env.example`.
 
 Los pasos o la configuración a seguir en el servicio de hosting serían los siguientes:
 
