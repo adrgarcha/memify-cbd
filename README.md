@@ -1,8 +1,10 @@
-<div style="display: flex; flex-direction: column; align-items: center">
-    <h1>Memify</h1>
+<h1 align="center">
+    Memify
+    <br><br>
     <img alt="Logo de Memify" width="256" height="256" src="./src/main/resources/static/images/MemifyLogo.jpg" />
-    <h4>Crear y viralizar memes nunca ha sido tán fácil.</h4>
-</div>
+    <br>    
+    <h4 align="center">Crear y viralizar memes nunca ha sido tán fácil.</h4>
+</h1>
 
 ## Manual de desarrollador
 ### Terminal
