@@ -27,6 +27,8 @@ public class MemeService {
     private final MemeRepository memeRepository;
     private final GridFsTemplate gridFsTemplate;
 
+    private final Integer FONT_SIZE = 40;
+
     public List<MemeResponse> getAllMemes() {
         return mapMemes(memeRepository.findAll());
     }
@@ -90,11 +92,49 @@ public class MemeService {
     private byte[] createMeme(byte[] memeImage, String upperText, String lowerText) throws IOException {
         BufferedImage image = ImageIO.read(new ByteArrayInputStream(memeImage));
         int imageHeight = image.getHeight();
-        int upperY = 50;
-        int lowerY = imageHeight - 10;
+        int upperY = 75;
+        int lowerY = imageHeight - 25;
 
-        byte[] upperTextImage = getImageWithText(memeImage, upperText, upperY);
-        return getImageWithText(upperTextImage, lowerText, lowerY);
+        memeImage = processTextAndCreateImage(memeImage, upperText, upperY);
+        memeImage = processTextAndCreateImage(memeImage, lowerText, lowerY);
+
+        return memeImage;
+    }
+
+    private byte[] processTextAndCreateImage(byte[] memeImage, String text, int y) throws IOException {
+        text = divideTextIntoBlocks(checkTextIsNotNullOrEmpty(text));
+        String[] textLines = text.split("\n");
+        int totalTextHeight = textLines.length * FONT_SIZE;
+        y = y - totalTextHeight / 2;
+
+        for (String line : textLines) {
+            memeImage = getImageWithText(memeImage, line, y);
+            y += 50;
+        }
+
+        return memeImage;
+    }
+
+    private String checkTextIsNotNullOrEmpty(String text) {
+        if (text == null || text.isEmpty()) {
+            return " ";
+        }
+        return text;
+    }
+
+    private String divideTextIntoBlocks(String text) {
+        String[] words = text.split(" ");
+        StringBuilder sb = new StringBuilder();
+        int wordsInBlock = 4;
+
+        for (int i = 0; i < words.length; i++) {
+            sb.append(words[i]).append(" ");
+            if ((i + 1) % wordsInBlock == 0) {
+                sb.append("\n");
+            }
+        }
+
+        return sb.toString();
     }
 
     private byte[] getImageWithText(byte[] imageBytes, String text, int y) throws IOException {
@@ -102,7 +142,7 @@ public class MemeService {
         Graphics2D graphics =  image.createGraphics();
         graphics.drawImage(image, 0, 0, null);
 
-        Font font = new Font("Impact", Font.BOLD, 50);
+        Font font = new Font("Impact", Font.BOLD, FONT_SIZE);
         graphics.setColor(Color.WHITE);
         graphics.setFont(font);
 
