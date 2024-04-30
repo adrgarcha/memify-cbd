@@ -50,12 +50,17 @@ public class TemplateController {
         if (name.isBlank() || template.isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name and template are required");
 
+        if (name.contains(" "))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Template name cannot contain spaces");
+
         if (templateService.getTemplateByName(name) != null)
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Template with this name already exists");
 
         if (template.getContentType() != null && !template.getContentType().startsWith("image/"))
             throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Only images are supported");
 
+        if (template.getContentType().startsWith("image/gif"))
+            throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "GIFs are not supported");
 
         return ResponseEntity.status(HttpStatus.CREATED).body(templateService.addTemplate(name, template));
     }

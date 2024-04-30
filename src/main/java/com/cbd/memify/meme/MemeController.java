@@ -58,6 +58,9 @@ public class MemeController {
         User user = userService.getUserByUsername(username);
         byte[] template = templateService.getTemplateByName(meme.getTemplateName());
 
+        if(meme.getName().contains(" "))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Meme name cannot contain spaces");
+
         if(memeService.getMemeByName(meme.getName()) != null)
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Meme with this name already exists");
 
